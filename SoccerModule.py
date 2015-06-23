@@ -37,13 +37,11 @@ class SoccerModule(ALModule):
 		self.motion = ALProxy("ALMotion")
 		# Initialize the posture module
 		self.posture = ALProxy("ALRobotPosture")
+		# Initialize the tracker module
+		self.tracker = ALProxy("ALTracker")
 
-		# Initialize the goal position
-		self.goal = [0, 0]
-		# Initialize the ball position
-		self.ball = [0, 0]
-		# Initialize a command stack
-		self.moves = []
+		# Initialize the tracking state
+		self.is_tracking = False
 
 	def initialize(self):
 		"""Subscribe to the required events and enable the different sub-modules"""
@@ -52,6 +50,12 @@ class SoccerModule(ALModule):
 		self.motion.setFallManagerEnabled(True)
 		# Enable the body balancer
 		self.motion.wbEnable(True)
+
+		# Register the targets for the tracker
+		self.tracker.registerTarget("RedBall", 0.2)
+		self.tracker.registerTarget("LandMark", [0.2, [85]])
+		# Turn of the search
+		self.tracker.toggleSearch(False)
 
 		# Subscribe to the redBallDetected event
 		memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
@@ -72,67 +76,42 @@ class SoccerModule(ALModule):
 	def shutdown(self):
 		"""Define the procedure to follow upon shutting down"""
 
+		# Stop the tracker
+		self.tracker.stopTracker()
+		# Unregister all tracker targets
+		self.tracker.unregisterAllTargets()
 		# Request the robot to go in resting position
 		self.motion.rest()
 		# Set the body stiffness to 0
 		self.motion.setStiffnesses("Body", 0)
 
-	def is_type_stacked(self, move_type):
-		"""Check if a move from the given type is already in the stack"""
-
-		# Initialize the result
-		result = False
-		# For each move in the stack
-		for move in self.moves:
-			# Check the type of move
-			if move[-1] == move_type:
-				result = True
-
-		# Return the result
-		return result
-
 	def on_red_ball(self):
 		"""Compute the position of the ball relative to the robot and move towards it"""
 
-		# Check if we are not already planning a move for the red ball
-		if not self.is_type_stacked("R"):
-			# Get the data from the memory
-			data = memory.getData("redBallDetected")
-			ball_info = data[1]
-			camera_pos = data[3]
-
-			# Compute the position of the ball relative to the robot
-			self.ball[0] = camera_pos[2] * tan(camera_pos[4] + ball_info[1] + ball_info[2]) + camera_pos[0]
-			self.ball[1] = camera_pos[2] * tan(camera_pos[3]) + camera_pos[1]
-
-			# Add the command to the stack
-			self.moves.append([self.ball[0], self.ball[1], 0, "R"])
-
+		# Check if we are not already tracking the red ball
+		if self.tracker.getActiveTarget() != "RedBall":
+			# Set tracker mode to Move
+			self.tracker.setMode("Move")
+			# Start to track the red ball
+			self.tracker.track("RedBall")
 			# Warn that we found a red ball
-			print("RED BALL DETECTED "+str(self.ball))
+			print("RED BALL DETECTED")
+			# Set the tracking state
+			self.is_tracking = True
 
 	def on_landmark_detected(self):
 		"""Compute the position of the landmark relative to the robot"""
 
-		# Check if we are not already planning a move for the landmark
-		if not self.is_type_stacked("L"):
-			# Get the data from the memory
-			data = memory.getData("LandmarkDetected")
-			# Check that we have the right mark
-			if data[1][0][1] == mark_id:
-				# Extract information regarding the mark
-				mark_info = data[1][0][0]
-				camera_pos = data[3]
-				# Compute the position of the landmark relative to the robot
-				self.goal[0] = camera_pos[2] * tan(camera_pos[4] + mark_info[2] + mark_info[3]) + camera_pos[0]
-				self.goal[1] = camera_pos[2] * tan(camera_pos[3]) + camera_pos[1]
-				# Turn the robot toward the goal
-				rotation = atan((self.goal[0] - self.ball[0]) / (self.goal[1] - self.ball[1]))
-
-				# Add the action to the stack
-				self.moves.append([0, 0, rotation, "L"])
-				# Warn that we found a landmark
-				print("LANDMARK DETECTED "+str(self.goal))
+		# Check if we are not already tracking the land mark
+		if self.tracker.getActiveTarget() != "LandMark":
+			# Set tracker mode to WholeBody
+			self.tracker.setMode("WholeBody")
+			# Start tracking the landmark
+			self.tracker.track("LandMark")
+			# Warn that we found a landmark
+			print("LANDMARK DETECTED")
+			# Set the tracking state
+			self.is_tracking = True
 
 	def on_fall(self):
 		"""Set the stiffness back and request the robot to get up"""
@@ -164,25 +143,17 @@ class SoccerModule(ALModule):
 		# Set the head back to 0
 		self.motion.setAngles(["HeadYaw"], [0], 1.0)
 
-	def next_move(self):
-		"""Execute the next move in the stack"""
+	def is_target_lost(self):
+		"""Check if the tracker is still locked on a target or not"""
 
-		# Check if there is any move to be done
-		if len(self.moves) > 0:
-			# Extract the move
-			move = self.moves.pop(0)
-			# Execute the move
-			self.motion.moveTo(move[0], move[1], move[2])
-			# Return a good result
-			result = True
-			# Display the next move
-			print("MOVING TO: "+str(move))
-		else:
-			# Return a bad result
-			result = False
-
-		# Return the final result
-		return result
+		# Check the state of the target
+		if self.tracker.isTargetLost():
+			# Stop the tracker
+			self.tracker.stopTracker()
+			# Set the state of the tracking
+			self.is_tracking = False
+			# Warn that we have lost the target
+			print("TRACKER TARGET LOST")
 
 	# TODO: Kick function and event triggering the kick delivery
 
@@ -214,11 +185,17 @@ def main():
 		soccer_module.initialize()
 		while True:
 			# Execute the next move if possible
-			if not soccer_module.next_move():
+			if not soccer_module.is_tracking:
 				# Have a look around
 				soccer_module.look_around()
+				# Wait for some time
 				sleep(3)
 				#TODO: Move in a strategic way
+			else:
+				# Check if the target is still in sight
+				soccer_module.is_target_lost()
+				# Wait for some time
+				sleep(1)
 	except KeyboardInterrupt:
 		# Shut the module down
 		soccer_module.shutdown()
