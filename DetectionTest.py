@@ -115,7 +115,7 @@ class TestModule(ALModule):
 		path = self.compute_path(effector)
 
 		# Execute the kicking movement
-		self.motion.transformInterpolations(effector, 1, path, axis_mask, [2, 0.5, 2])
+		self.motion.transformInterpolations(effector, 1, path, axis_mask, [2, 2.5, 4.5])
 		# The last parameter correspond to the relative times for executing each path chunk
 
 		# Go back to stand init posture
