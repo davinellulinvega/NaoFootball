@@ -46,6 +46,8 @@ class TestModule(ALModule):
 	def shutdown(self):
 		"""Shut the module down gracefully"""
 
+		# Disable the whole body motion
+		self.motion.wbEnable(False)
 		# Put the robot to rest
 		self.motion.rest()
 
