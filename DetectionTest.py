@@ -9,8 +9,7 @@ from optparse import OptionParser
 import almath
 
 # Declare global variables
-nao_ip = "127.0.0.1"
-#nao_ip = "192.168.0.100"
+nao_ip = "192.168.0.100"
 nao_port = 9559
 memory = None
 test_module = None
@@ -57,9 +56,9 @@ class TestModule(ALModule):
 		# Initialize the parameters
 		path = []
 		current_tf = []
-		dx = 0.01
+		dx = 0.001
 		dz = 0.05
-		dwy = 2 * almath.TO_RAD
+		dwy = 1 * almath.TO_RAD
 
 		# Get the current transform for the effector
 		try:
@@ -115,11 +114,11 @@ class TestModule(ALModule):
 		path = self.compute_path(effector)
 
 		# Execute the kicking movement
-		self.motion.transformInterpolations(effector, 1, path, axis_mask, [2, 2.5, 4.5])
+		self.motion.transformInterpolations(effector, 1, path, axis_mask, [0.5, 0.505, 1.005])
 		# The last parameter correspond to the relative times for executing each path chunk
 
 		# Go back to stand init posture
-		self.posture.goToPosture("StandInit", 0.8)
+		self.posture.goToPosture("StandInit", 1.0)
 
 
 # Definition of the main function
