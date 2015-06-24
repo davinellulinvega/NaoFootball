@@ -63,7 +63,7 @@ class TestModule(ALModule):
 
 		# Get the current transform for the effector
 		try:
-			current_tf = self.motion.getTransform(effector, self.motion.FRAME_WORLD, False)
+			current_tf = self.motion.getTransform(effector, 1, False)
 		except Exception, error_msg:
 			# Print the error message
 			print(error_msg)
@@ -115,7 +115,7 @@ class TestModule(ALModule):
 		path = self.compute_path(effector)
 
 		# Execute the kicking movement
-		self.motion.transformInterpolations(effector, self.motion.FRAME_WORLD, path, axis_mask, [2, 0.5, 2])
+		self.motion.transformInterpolations(effector, 1, path, axis_mask, [2, 0.5, 2])
 		# The last parameter correspond to the relative times for executing each path chunk
 
 		# Go back to stand init posture
