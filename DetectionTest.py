@@ -119,7 +119,7 @@ class TestModule(ALModule):
 		# The last parameter correspond to the relative times for executing each path chunk
 
 		# Go back to stand init posture
-		self.posture("StandInit", 0.8)
+		self.posture.goToPosture("StandInit", 0.8)
 
 
 # Definition of the main function
