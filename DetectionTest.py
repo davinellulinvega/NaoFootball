@@ -89,6 +89,36 @@ class TestModule(ALModule):
 		# Return the path
 		return path
 
+	def kick(self):
+		"""Define the procedure to follow to accomplish a kick"""
+
+		# Initialize parameters
+		axis_mask = 63  # Control translation and rotation
+		effector = "RLeg" # We will kick with the right leg
+
+		# Go to stand init posture
+		self.posture.goToPosture("StandInit", 0.8)
+
+		# Define both legs as fixed
+		self.motion.wbFootState("Fixed", "Legs")
+		# Constrain balance through leg motion
+		self.motion.wbEnableBalanceConstraint(True, "Legs")
+
+		# Define the left leg as support
+		self.motion.wbGoToBalance("LLeg", 1)
+		# Define the right leg as free
+		self.motion.wbFootState("Free", "RLeg")
+
+		# Compute the path
+		path = self.compute_path(effector)
+
+		# Execute the kicking movement
+		self.motion.transformInterpolations(effector, self.motion.FRAME_WORLD, path, axis_mask, [2, 0.5, 2])
+		# The last parameter correspond to the relative times for executing each path chunk
+
+		# Go back to stand init posture
+		self.posture("StandInit", 0.8)
+
 
 # Definition of the main function
 def main():
