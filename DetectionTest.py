@@ -147,8 +147,10 @@ def main():
 	# Initialize all sub-modules and the brain
 	test_module.initialize()
 	try:
-		# Track the target
-		test_module.tracker.track("RedBall")
+		# Execute a kick
+		test_module.kick()
+		# Shutdown the module
+		test_module.shutdown()
 	except KeyboardInterrupt:
 		# Shutdown the module
 		test_module.shutdown()
