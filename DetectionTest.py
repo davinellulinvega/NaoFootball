@@ -73,7 +73,7 @@ class TestModule(ALModule):
 		# Move the foot back
 		target_tf = almath.Transform(current_tf)
 		target_tf *= almath.Transform(-dx, 0, dz)
-		target_tf *= almath.Transform(dwy)
+		target_tf *= almath.Transform().fromRotY(dwy)
 
 		# Append the first chunk to the path
 		path.append(list(target_tf.toVector()))
