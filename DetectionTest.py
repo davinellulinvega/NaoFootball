@@ -6,9 +6,11 @@ from naoqi import ALProxy
 from naoqi import ALModule
 from naoqi import ALBroker
 from optparse import OptionParser
+import almath
 
 # Declare global variables
-nao_ip = "192.168.0.100"
+nao_ip = "127.0.0.1"
+#nao_ip = "192.168.0.100"
 nao_port = 9559
 memory = None
 test_module = None
@@ -30,26 +32,62 @@ class TestModule(ALModule):
 
 		# Initialize a motion module
 		self.motion = ALProxy("ALMotion")
-		# Initialize a tracker module
-		self.tracker = ALProxy("ALTracker")
+		# Initialize a posture module
+		self.posture = ALProxy("ALRobotPosture")
 
 	def initialize(self):
 		"""Initialize the inner modules of the module"""
 
 		# Wake the robot up
 		self.motion.wakeUp()
-		# Set the target name
-		self.tracker.registerTarget("RedBall", 0.1)
-		# Set the tracking mode
-		self.tracker.setMode("Move")
+		# Enable the whole body motion
+		self.motion.wbEnable(True)
 
 	def shutdown(self):
 		"""Shut the module down gracefully"""
 
-		# Unregister all targets
-		self.tracker.unregisterAllTargets()
 		# Put the robot to rest
 		self.motion.rest()
+
+	def compute_path(self, effector):
+		"""Compute the optimal path to realize a kick through the given effector"""
+
+		# Initialize the parameters
+		path = []
+		current_tf = []
+		dx = 0.01
+		dz = 0.05
+		dwy = 2 * almath.TO_RAD
+
+		# Get the current transform for the effector
+		try:
+			current_tf = self.motion.getTransform(effector, self.motion.FRAME_WORLD, False)
+		except Exception, error_msg:
+			# Print the error message
+			print(error_msg)
+			# Exit the program
+			exit(1)
+
+		# Move the foot back
+		target_tf = almath.Transform(current_tf)
+		target_tf *= almath.Transform(-dx, 0, dz)
+		target_tf *= almath.Transform(dwy)
+
+		# Append the first chunk to the path
+		path.append(list(target_tf.toVector()))
+
+		# Move the foot forward
+		target_tf = almath.Transform(current_tf)
+		target_tf *= almath.Transform(dx, 0, dz)
+
+		# Append the second chunk to the path
+		path.append(list(target_tf.toVector()))
+
+		# Append the third chunk to the path (move back to initial position)
+		path.append(current_tf)
+
+		# Return the path
+		return path
 
 
 # Definition of the main function
