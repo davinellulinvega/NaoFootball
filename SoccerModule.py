@@ -11,6 +11,7 @@ from time import sleep
 from math import pi
 from math import atan
 from math import tan
+from math import sqrt
 
 # Define global parameters
 nao_ip = "192.168.0.100"
@@ -105,8 +106,18 @@ class SoccerModule(ALModule):
 			self.ball[0] = camera_pos[2] * tan(camera_pos[4] + ball_info[1] + ball_info[2]) + camera_pos[0]
 			self.ball[1] = camera_pos[2] * tan(camera_pos[3]) + camera_pos[1]
 
-			# Add the command to the stack
-			self.moves.append([self.ball[0], self.ball[1], 0, "R"])
+			# Compute the distance between the robot and the ball
+			dist = sqrt(self.ball[0]**2 + self.ball[1]**2)
+			# Compute the rotation of the ball to the camera center
+			rotation = camera_pos[-1] + ball_info[0]
+
+			# Add the rotation of the body to the stack
+			self.moves.append([0, 0, rotation, "R"])
+			# Add the move toward the ball to the stack
+			self.moves.append([dist, 0, 0, "R"])
+
+			# Move the head to face the ball
+			self.motion.setAngles("HeadYaw", -ball_info[0], 0.2)
 
 			# Warn that we found a red ball
 			print("RED BALL DETECTED "+str(self.ball))
