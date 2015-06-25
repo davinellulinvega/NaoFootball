@@ -95,7 +95,7 @@ class TestModule(ALModule):
 
 		# Initialize parameters
 		axis_mask = 63  # Control translation and rotation
-		effector = "RLeg" # We will kick with the right leg
+		effector = "RLeg"  # We will kick with the right leg
 
 		# Go to stand init posture
 		self.posture.goToPosture("StandInit", 0.8)
