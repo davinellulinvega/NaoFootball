@@ -7,6 +7,7 @@ from naoqi import ALModule
 from naoqi import ALBroker
 from optparse import OptionParser
 import almath
+from time import sleep
 
 # Declare global variables
 nao_ip = "192.168.0.100"
@@ -50,72 +51,27 @@ class TestModule(ALModule):
 		# Put the robot to rest
 		self.motion.rest()
 
-	def compute_path(self, effector):
-		"""Compute the optimal path to realize a kick through the given effector"""
-
-		# Initialize the parameters
-		path = []
-		current_tf = []
-		dx = 0.05
-		dz = 0.05
-		dwy = 5 * almath.TO_RAD
-
-		# Get the current transform for the effector
-		try:
-			current_tf = self.motion.getTransform(effector, 1, False)
-		except Exception, error_msg:
-			# Print the error message
-			print(error_msg)
-			# Exit the program
-			exit(1)
-
-		# Move the foot back
-		target_tf = almath.Transform(current_tf)
-		target_tf *= almath.Transform(-dx, 0, dz)
-		target_tf *= almath.Transform().fromRotY(dwy)
-
-		# Append the first chunk to the path
-		path.append(list(target_tf.toVector()))
-
-		# Move the foot forward
-		target_tf = almath.Transform(current_tf)
-		target_tf *= almath.Transform(dx, 0, dz)
-
-		# Append the second chunk to the path
-		path.append(list(target_tf.toVector()))
-
-		# Append the third chunk to the path (move back to initial position)
-		path.append(current_tf)
-
-		# Return the path
-		return path
-
 	def kick(self):
 		"""Define the procedure to follow to accomplish a kick"""
-
-		# Initialize parameters
-		axis_mask = 63  # Control translation and rotation
-		effector = "RLeg"  # We will kick with the right leg
 
 		# Go to stand init posture
 		self.posture.goToPosture("StandInit", 0.5)
 
-		# Define both legs as fixed
-		self.motion.wbFootState("Fixed", "Legs")
-		# Constrain balance through leg motion
-		self.motion.wbEnableBalanceConstraint(True, "Legs")
+		# Define the joints we are interested in
+		hip_joints = ["RHipRoll", "LHipRoll"]
 
-		# Define the left leg as support
-		self.motion.wbGoToBalance("LLeg", 1)
-		# Define the right leg as free
-		self.motion.wbFootState("Free", "RLeg")
+		# Get the angles for HipRolls
+		angles = self.motion.getAngles(hip_joints, True)
 
-		# Compute the path
-		path = self.compute_path(effector)
+		# Modify the value of the hip rolls
+		angles[0] -= 10 * almath.TO_RAD
+		angles[1] += 10 * almath.TO_RAD
 
-		# Execute the kicking movement
-		self.motion.transformInterpolations(effector, 1, path, axis_mask, [2, 2.7, 4.5])
-		# The last parameter correspond to the relative times for executing each path chunk
+		# Set the angles to have Nao stand on one foot
+		self.motion.setAngles(hip_joints, angles, 0.2)
+
+		# Wait for some time
+		sleep(5)
 
 		# Go back to stand init posture
 		self.posture.goToPosture("StandInit", 0.5)
