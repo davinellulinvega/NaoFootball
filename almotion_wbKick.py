@@ -10,7 +10,7 @@ import almath
 from naoqi import ALProxy
 
 def computePath(proxy, effector, frame):
-    dx      = 0.07                 # translation axis X (meters)
+    dx      = 0.08                 # translation axis X (meters)
     dz      = 0.07                 # translation axis Z (meters)
     dwy     = 5.0*almath.TO_RAD    # rotation axis Y (radian)
 
@@ -87,40 +87,14 @@ def main(robotIP, PORT=9559):
     frame    = motion.FRAME_WORLD
 
     # Motion of the RLeg
-    times   = [1.3, 1.5, 2.3]
+    times   = [1.2, 1.6, 2.3]
 
     path = computePath(motionProxy, effector, frame)
 
-    motionProxy.transformInterpolations(effector, frame, path, axisMask, times)
-
-    # Example showing how to Enable Effector Control as an Optimization
-    isActive     = False
-    motionProxy.wbEnableEffectorOptimization(effector, isActive)
-
-    # Com go to LLeg
-    supportLeg = "RLeg"
-    duration   = 2.5
-    motionProxy.wbGoToBalance(supportLeg, duration)
-
-    # RLeg is free
-    stateName  = "Free"
-    supportLeg = "LLeg"
-    motionProxy.wbFootState(stateName, supportLeg)
-
-    effector = "LLeg"
-    path = computePath(motionProxy, effector, frame)
     motionProxy.transformInterpolations(effector, frame, path, axisMask, times)
 
     time.sleep(1.0)
 
-    # Deactivate Head tracking
-    isEnabled = False
-    motionProxy.wbEnable(isEnabled)
-
-    # send robot to Pose Init
-    postureProxy.goToPosture("StandInit", 0.3)
-
-    # Go to rest position
     motionProxy.rest()
 
 if __name__ == "__main__":
