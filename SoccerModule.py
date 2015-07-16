@@ -12,6 +12,8 @@ from math import pi
 from math import atan
 from math import tan
 from math import sqrt
+import motion
+import almath
 
 # Define global parameters
 nao_ip = "192.168.0.100"
@@ -20,6 +22,37 @@ memory = None
 soccer_module = None
 mark_id = 85
 
+def computePath(proxy, effector, frame):
+    dx      = 0.08                 # translation axis X (meters)
+    dz      = 0.07                 # translation axis Z (meters)
+    dwy     = 5.0*almath.TO_RAD    # rotation axis Y (radian)
+
+    useSensorValues = False
+
+    path = []
+    currentTf = []
+    try:
+        currentTf = proxy.getTransform(effector, frame, useSensorValues)
+    except Exception, errorMsg:
+        print str(errorMsg)
+        print "This example is not allowed on this robot."
+        exit()
+
+    # 1
+    targetTf  = almath.Transform(currentTf)
+    targetTf *= almath.Transform(0.0, 0.0, dz)
+    targetTf *= almath.Transform().fromRotY(dwy)
+    path.append(list(targetTf.toVector()))
+
+    # 2
+    targetTf  = almath.Transform(currentTf)
+    targetTf *= almath.Transform(dx, 0.0, dz)
+    path.append(list(targetTf.toVector()))
+
+    # 3
+    path.append(currentTf)
+
+    return path
 
 # Define the soccer module
 class SoccerModule(ALModule):
@@ -187,8 +220,51 @@ class SoccerModule(ALModule):
 	def kick(self):
 		"""Have the robot execute a kick"""
 
-	# TODO: Kick function and event triggering the kick delivery
+    	# Wake up robot
+    	self.motion.wakeUp()
 
+    	# Send robot to Stand Init
+    	self.posture.goToPosture("StandInit", 0.5)
+
+    	# Activate Whole Body Balancer
+    	isEnabled  = True
+    	self.motion.wbEnable(isEnabled)
+
+    	# Legs are constrained fixed
+    	stateName  = "Fixed"
+    	supportLeg = "Legs"
+    	self.motion.wbFootState(stateName, supportLeg)
+
+		# Constraint Balance Motion
+    	isEnable   = True
+    	supportLeg = "Legs"
+    	self.motion.wbEnableBalanceConstraint(isEnable, supportLeg)
+
+    	# Com go to LLeg
+    	supportLeg = "LLeg"
+    	duration   = 2.5
+    	self.motion.wbGoToBalance(supportLeg, duration)
+
+    	# RLeg is free
+    	stateName  = "Free"
+    	supportLeg = "RLeg"
+    	self.motion.wbFootState(stateName, supportLeg)
+
+    	# RLeg is optimized
+    	effector = "RLeg"
+    	axisMask = 63
+    	frame    = motion.FRAME_WORLD
+
+    	# Motion of the RLeg
+    	times   = [1.2, 1.6, 2.3]
+
+    	path = computePath(self.motion, effector, frame)
+
+    	self.motion.transformInterpolations(effector, frame, path, axisMask, times)
+
+    	sleep(1.0)
+
+    	self.motion.rest()
 
 # Definition of the main function
 def main():
