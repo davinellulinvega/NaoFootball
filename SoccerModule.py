@@ -101,7 +101,7 @@ class SoccerModule(ALModule):
 			self.move = ([0, 0, rotation], [dist, 0, 0])
 
 			# Move the head to face the ball
-			self.motion.setAngles("HeadYaw", -ball_info[0], 0.2)
+			# self.motion.setAngles("HeadYaw", -ball_info[0], 0.2)
 
 			# Warn that we found a red ball
 			print("RED BALL DETECTED "+str(self.ball))
@@ -149,7 +149,7 @@ class SoccerModule(ALModule):
 		"""Move the robot head from -2.08 to 2.08"""
 
 		# Set the head yaw angle
-		self.motion.setAngles(["HeadYaw"], [-2.08], 0.2)
+		self.motion.setAngles(["HeadYaw"], [-2.08], 0.1)
 		# Wait for some time
 		sleep(3)
 		# set the head yaw angle
@@ -183,6 +183,9 @@ class SoccerModule(ALModule):
 
 		# Return the final result
 		return result
+
+	def kick(self):
+		"""Have the robot execute a kick"""
 
 	# TODO: Kick function and event triggering the kick delivery
 
