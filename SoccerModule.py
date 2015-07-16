@@ -44,7 +44,7 @@ class SoccerModule(ALModule):
 		# Initialize the ball position
 		self.ball = [0, 0]
 		# Initialize a command stack
-		self.moves = []
+		self.move = None
 
 	def initialize(self):
 		"""Subscribe to the required events and enable the different sub-modules"""
@@ -78,25 +78,11 @@ class SoccerModule(ALModule):
 		# Set the body stiffness to 0
 		self.motion.setStiffnesses("Body", 0)
 
-	def is_type_stacked(self, move_type):
-		"""Check if a move from the given type is already in the stack"""
-
-		# Initialize the result
-		result = False
-		# For each move in the stack
-		for move in self.moves:
-			# Check the type of move
-			if move[-1] == move_type:
-				result = True
-
-		# Return the result
-		return result
-
 	def on_red_ball(self):
 		"""Compute the position of the ball relative to the robot and move towards it"""
 
 		# Check if we are not already planning a move for the red ball
-		if not self.is_type_stacked("R"):
+		if not (self.move is None):
 			# Get the data from the memory
 			data = memory.getData("redBallDetected")
 			ball_info = data[1]
@@ -111,10 +97,8 @@ class SoccerModule(ALModule):
 			# Compute the rotation of the ball to the camera center
 			rotation = camera_pos[-1] + ball_info[0]
 
-			# Add the rotation of the body to the stack
-			self.moves.append([0, 0, rotation, "R"])
-			# Add the move toward the ball to the stack
-			self.moves.append([dist, 0, 0, "R"])
+			# Set the next moves to be executed
+			self.move = ([0, 0, rotation], [dist, 0, 0])
 
 			# Move the head to face the ball
 			self.motion.setAngles("HeadYaw", -ball_info[0], 0.2)
@@ -126,7 +110,7 @@ class SoccerModule(ALModule):
 		"""Compute the position of the landmark relative to the robot"""
 
 		# Check if we are not already planning a move for the landmark
-		if not self.is_type_stacked("L"):
+		if not (self.move is None):
 			# Get the data from the memory
 			data = memory.getData("LandmarkDetected")
 			# Check that we have the right mark
@@ -141,7 +125,7 @@ class SoccerModule(ALModule):
 				rotation = atan((self.goal[0] - self.ball[0]) / (self.goal[1] - self.ball[1]))
 
 				# Add the action to the stack
-				self.moves.append([0, 0, rotation, "L"])
+				self.move = ([0, 0, rotation], "kick")
 				# Warn that we found a landmark
 				print("LANDMARK DETECTED "+str(self.goal))
 
@@ -179,18 +163,23 @@ class SoccerModule(ALModule):
 		"""Execute the next move in the stack"""
 
 		# Check if there is any move to be done
-		if len(self.moves) > 0:
-			# Extract the move
-			move = self.moves.pop(0)
-			# Execute the move
-			self.motion.moveTo(move[0], move[1], move[2])
-			# Return a good result
-			result = True
-			# Display the next move
-			print("MOVING TO: "+str(move))
-		else:
+		if self.move is None:
 			# Return a bad result
 			result = False
+		else:
+			# Execute the move
+			for moves in list(self.move):
+				# Check if a kick
+				if moves == "kick":
+					# Have the robot kick
+					self.kick()
+				else:
+					# Make the robot move
+					self.motion.moveTo(moves[0], moves[1], moves[2])
+				# Return a good result
+				result = True
+				# Display the next move
+				print("NEXT ACTION: "+str(moves))
 
 		# Return the final result
 		return result
