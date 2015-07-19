@@ -22,7 +22,7 @@ memory = None
 soccer_module = None
 mark_id = 85
 
-def computePath(proxy, effector, frame):
+def compute_path(proxy, effector, frame):
     dx      = 0.08                 # translation axis X (meters)
     dz      = 0.07                 # translation axis Z (meters)
     dwy     = 5.0*almath.TO_RAD    # rotation axis Y (radian)
@@ -54,11 +54,12 @@ def computePath(proxy, effector, frame):
 
     return path
 
+
 # Define the soccer module
 class SoccerModule(ALModule):
-	"""A simple module allowing Nao to play soccer"""
+    """A simple module allowing Nao to play soccer"""
 
-	def __init__(self, var_name):
+    def __init__(self, var_name):
 		"""Define and initialize the class' attributes"""
 
 		# Request the parent module to initialize and register our module
@@ -220,51 +221,33 @@ class SoccerModule(ALModule):
 	def kick(self):
 		"""Have the robot execute a kick"""
 
-    	# Wake up robot
-    	self.motion.wakeUp()
+		# Request robot to go to stand init posture
+		self.posture.goToPosture("StandInit", 0.5)
 
-    	# Send robot to Stand Init
-    	self.posture.goToPosture("StandInit", 0.5)
+		# Activate whole body balancer
+		self.motion.wbEnable(True)
 
-    	# Activate Whole Body Balancer
-    	isEnabled  = True
-    	self.motion.wbEnable(isEnabled)
+		# Constraint both legs as fixed
+		self.motion.wbFootState("Fixed", "Legs")
 
-    	# Legs are constrained fixed
-    	stateName  = "Fixed"
-    	supportLeg = "Legs"
-    	self.motion.wbFootState(stateName, supportLeg)
+		# Request legs joints to move to keep robot's balance
+		self.motion.wbEnableBalanceConstraint(True, "Legs")
 
-		# Constraint Balance Motion
-    	isEnable   = True
-    	supportLeg = "Legs"
-    	self.motion.wbEnableBalanceConstraint(isEnable, supportLeg)
+		# Balance the robot on the left leg
+		self.motion.wbGoToBalance("LLeg", 2.5)
 
-    	# Com go to LLeg
-    	supportLeg = "LLeg"
-    	duration   = 2.5
-    	self.motion.wbGoToBalance(supportLeg, duration)
+		# Remove fixed constraint from the right leg
+		self.motion.wbFootState("Free", "RLeg")
 
-    	# RLeg is free
-    	stateName  = "Free"
-    	supportLeg = "RLeg"
-    	self.motion.wbFootState(stateName, supportLeg)
+		# Compute the path for moving the right leg back and forth
+		path = compute_path(self.motion, "RLeg", motion.FRAME_WORLD)
 
-    	# RLeg is optimized
-    	effector = "RLeg"
-    	axisMask = 63
-    	frame    = motion.FRAME_WORLD
+		# Request the right leg to move following the computed path
+		times = [1.2, 1.6, 2.3]
+		self.motion.transformInterpolations("RLeg", motion.FRAME_WORLD, path, 63, times)
 
-    	# Motion of the RLeg
-    	times   = [1.2, 1.6, 2.3]
-
-    	path = computePath(self.motion, effector, frame)
-
-    	self.motion.transformInterpolations(effector, frame, path, axisMask, times)
-
-    	sleep(1.0)
-
-    	self.motion.rest()
+		# Request the robot to stand in initial position
+		self.posture.goToPosture("StandInit", 0.2)
 
 # Definition of the main function
 def main():
