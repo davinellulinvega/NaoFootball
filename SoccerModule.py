@@ -23,35 +23,37 @@ soccer_module = None
 mark_id = 85
 
 def compute_path(proxy, effector, frame):
+    # Initialize the parameters
     dx      = 0.08                 # translation axis X (meters)
     dz      = 0.07                 # translation axis Z (meters)
     dwy     = 5.0*almath.TO_RAD    # rotation axis Y (radian)
 
-    useSensorValues = False
-
     path = []
     currentTf = []
+
     try:
-        currentTf = proxy.getTransform(effector, frame, useSensorValues)
+        # Try to get the current transform for the effector
+        currentTf = proxy.getTransform(effector, frame, False)
     except Exception, errorMsg:
         print str(errorMsg)
         print "This example is not allowed on this robot."
         exit()
 
-    # 1
+    # Compute the first portion of the movement (moving backward)
     targetTf  = almath.Transform(currentTf)
     targetTf *= almath.Transform(0.0, 0.0, dz)
     targetTf *= almath.Transform().fromRotY(dwy)
     path.append(list(targetTf.toVector()))
 
-    # 2
+    # Compute the second part of the movement (moving forward)
     targetTf  = almath.Transform(currentTf)
     targetTf *= almath.Transform(dx, 0.0, dz)
     path.append(list(targetTf.toVector()))
 
-    # 3
+    # Finally compute the path for moving the effector in its original position
     path.append(currentTf)
 
+    # Return the computed path
     return path
 
 
@@ -60,7 +62,7 @@ class SoccerModule(ALModule):
     """A simple module allowing Nao to play soccer"""
 
     def __init__(self, var_name):
-		"""Define and initialize the class' attributes"""
+        """Define and initialize the class' attributes"""
 
 		# Request the parent module to initialize and register our module
 		ALModule.__init__(self, var_name)
