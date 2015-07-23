@@ -196,6 +196,7 @@ class SoccerModule(ALModule):
 
         # Set the head pitch angle
         self.motion.setAngles(["HeadPitch"], [20 * almath.TO_RAD], 0.5)
+        # TODO: replace the previous line with an increment for looking up and down back and forth
         # Set the head yaw angle
         self.motion.setAngles(["HeadYaw"], [-2.08], 0.1)
         # Wait for some time
