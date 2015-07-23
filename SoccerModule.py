@@ -146,9 +146,6 @@ class SoccerModule(ALModule):
             # Warn that we found a red ball
             print("RED BALL DETECTED " + str(self.ball))
 
-            # Sleep for some time
-            sleep(0.5)
-
     def on_landmark_detected(self):
         """Compute the position of the landmark relative to the robot"""
 
@@ -171,9 +168,6 @@ class SoccerModule(ALModule):
                 self.move = ([0, 0, rotation], "kick")
                 # Warn that we found a landmark
                 print("LANDMARK DETECTED " + str(self.goal))
-
-                # Wait for some time
-                sleep(0.5)
 
     def on_fall(self):
         """Set the stiffness back and request the robot to get up"""
