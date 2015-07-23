@@ -102,8 +102,8 @@ class SoccerModule(ALModule):
         memory.subscribeToEvent("robotHasFallen", self.getName(), "on_fall")
         # memory.subscribeToEvent("ALMotion/RobotIsFalling", self.getName(), "on_fall")
         # Subscribe to the bumperPressed event
-        memory.subscribeToEvent("RightBumperPressed", self.getName(), "on_bumper_pressed")
-        memory.subscribeToEvent("LeftBumperPressed", self.getName(), "on_bumper_pressed")
+        # memory.subscribeToEvent("RightBumperPressed", self.getName(), "on_bumper_pressed")
+        # memory.subscribeToEvent("LeftBumperPressed", self.getName(), "on_bumper_pressed")
         # Subscribe to the landmarkDetected event
         memory.subscribeToEvent("LandmarkDetected", self.getName(), "on_landmark_detected")
 
