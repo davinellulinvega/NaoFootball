@@ -52,7 +52,7 @@ class SoccerModule(ALModule):
 		self.motion.wbEnable(True)
 
 		# Register the targets for the tracker
-		self.tracker.registerTarget("RedBall", 0.2)
+		self.tracker.registerTarget("RedBall", 0.5)
 		self.tracker.registerTarget("LandMark", [0.2, [85]])
 		# Turn of the search
 		self.tracker.toggleSearch(False)
