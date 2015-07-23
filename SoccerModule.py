@@ -11,7 +11,6 @@ from time import sleep
 from math import pi
 from math import atan
 from math import tan
-from math import sqrt
 import motion
 import almath
 
