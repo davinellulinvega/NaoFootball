@@ -119,7 +119,7 @@ class SoccerModule(ALModule):
         """Compute the position of the ball relative to the robot and move towards it"""
 
         # Check if we are not already planning a move for the red ball
-        if self.move is not None:
+        if self.move is None:
             # Get the data from the memory
             data = memory.getData("redBallDetected")
             ball_info = data[1]
@@ -147,7 +147,7 @@ class SoccerModule(ALModule):
         """Compute the position of the landmark relative to the robot"""
 
         # Check if we are not already planning a move for the landmark
-        if self.move is not None:
+        if self.move is None:
             # Get the data from the memory
             data = memory.getData("LandmarkDetected")
             # Check that we have the right mark
