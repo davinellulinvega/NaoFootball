@@ -61,7 +61,7 @@ class SoccerModule(ALModule):
 		memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
 		# Subscribe to the robot has fallen event
 		memory.subscribeToEvent("robotHasFallen", self.getName(), "on_fall")
-		#memory.subscribeToEvent("ALMotion/RobotIsFalling", self.getName(), "on_fall")
+
 		# Subscribe to the bumperPressed event
 		memory.subscribeToEvent("RightBumperPressed", self.getName(), "on_bumper_pressed")
 		memory.subscribeToEvent("LeftBumperPressed", self.getName(), "on_bumper_pressed")
