@@ -96,6 +96,9 @@ class SoccerModule(ALModule):
         # Request the robot to stand
         self.posture.goToPosture("StandInit", 0.5)
 
+        # Wait for some time
+        sleep(1)
+
         # Subscribe to the redBallDetected event
         memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
         # Subscribe to the robot has fallen event
@@ -143,6 +146,9 @@ class SoccerModule(ALModule):
             # Warn that we found a red ball
             print("RED BALL DETECTED " + str(self.ball))
 
+            # Sleep for some time
+            sleep(0.5)
+
     def on_landmark_detected(self):
         """Compute the position of the landmark relative to the robot"""
 
@@ -165,6 +171,9 @@ class SoccerModule(ALModule):
                 self.move = ([0, 0, rotation], "kick")
                 # Warn that we found a landmark
                 print("LANDMARK DETECTED " + str(self.goal))
+
+                # Wait for some time
+                sleep(0.5)
 
     def on_fall(self):
         """Set the stiffness back and request the robot to get up"""
@@ -210,6 +219,8 @@ class SoccerModule(ALModule):
         else:
             # Execute the move
             for moves in list(self.move):
+                # Display the next move
+                print("NEXT ACTION: " + str(moves))
                 # Check if a kick
                 if moves == "kick":
                     # Have the robot kick
@@ -219,8 +230,9 @@ class SoccerModule(ALModule):
                     self.motion.moveTo(moves[0], moves[1], moves[2])
                 # Return a good result
                 result = True
-                # Display the next move
-                print("NEXT ACTION: " + str(moves))
+
+            # Wait for a little time
+            sleep(1)
             # Assign None to move
             self.move = None
 
