@@ -196,7 +196,9 @@ class SoccerModule(ALModule):
         # Wait for some time
         sleep(3)
         # Set the head back to 0
-        self.motion.setAngles(["HeadYaw"], [0], 1.0)
+        self.motion.setAngles(["HeadYaw"], [0], 0.5)
+        # Wait for some time
+        sleep(3)
 
     def next_move(self):
         """Execute the next move in the stack"""
