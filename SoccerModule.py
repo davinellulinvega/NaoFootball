@@ -185,12 +185,14 @@ class SoccerModule(ALModule):
     def look_around(self):
         """Move the robot head from -2.08 to 2.08"""
 
+        # Set the head pitch angle
+        self.motion.setAngles(["HeadPitch"], [10 * almath.TO_RAD], 0.5)
         # Set the head yaw angle
         self.motion.setAngles(["HeadYaw"], [-2.08], 0.1)
         # Wait for some time
         sleep(3)
         # set the head yaw angle
-        self.motion.setAngles(["HeadYaw"], [2.08], 0.2)
+        self.motion.setAngles(["HeadYaw"], [2.08], 0.1)
         # Wait for some time
         sleep(3)
         # Set the head back to 0
