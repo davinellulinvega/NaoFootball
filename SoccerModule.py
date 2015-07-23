@@ -91,6 +91,11 @@ class SoccerModule(ALModule):
         # Enable the body balancer
         self.motion.wbEnable(True)
 
+        # Wake the robot up
+        self.motion.wakeUp()
+        # Request the robot to stand
+        self.posture.goToPosture("StandInit", 0.5)
+
         # Subscribe to the redBallDetected event
         memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
         # Subscribe to the robot has fallen event
@@ -101,11 +106,6 @@ class SoccerModule(ALModule):
         memory.subscribeToEvent("LeftBumperPressed", self.getName(), "on_bumper_pressed")
         # Subscribe to the landmarkDetected event
         memory.subscribeToEvent("LandmarkDetected", self.getName(), "on_landmark_detected")
-
-        # Wake the robot up
-        self.motion.wakeUp()
-        # Request the robot to stand
-        self.posture.goToPosture("StandInit", 0.5)
 
     def shutdown(self):
         """Define the procedure to follow upon shutting down"""
@@ -186,7 +186,7 @@ class SoccerModule(ALModule):
         """Move the robot head from -2.08 to 2.08"""
 
         # Set the head pitch angle
-        self.motion.setAngles(["HeadPitch"], [10 * almath.TO_RAD], 0.5)
+        self.motion.setAngles(["HeadPitch"], [20 * almath.TO_RAD], 0.5)
         # Set the head yaw angle
         self.motion.setAngles(["HeadYaw"], [-2.08], 0.1)
         # Wait for some time
@@ -198,7 +198,7 @@ class SoccerModule(ALModule):
         # Set the head back to 0
         self.motion.setAngles(["HeadYaw"], [0], 0.5)
         # Wait for some time
-        sleep(3)
+        sleep(1)
 
     def next_move(self):
         """Execute the next move in the stack"""
