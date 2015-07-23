@@ -221,6 +221,8 @@ class SoccerModule(ALModule):
                 result = True
                 # Display the next move
                 print("NEXT ACTION: " + str(moves))
+            # Assign None to move
+            self.move = None
 
         # Return the final result
         return result
