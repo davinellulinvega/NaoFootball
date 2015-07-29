@@ -134,6 +134,9 @@ class SoccerModule(ALModule):
 
             # Compute the distance between the robot and the ball
             dist = camera_pos[2] * tan(camera_pos[4] + ball_info[1])
+            # Compare to the euclidean distance
+            dist_eucl = sqrt(self.ball[0]**2 + self.ball[1]**2)
+            print("Distance difference: "+str(dist - dist_eucl))
             # Compute the rotation of the ball to the camera center
             rotation = camera_pos[-1] + ball_info[0]
 
