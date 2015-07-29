@@ -137,6 +137,7 @@ class SoccerModule(ALModule):
             # Compare to the euclidean distance
             dist_eucl = sqrt(self.ball[0]**2 + self.ball[1]**2)
             print("Distance difference: "+str(dist - dist_eucl))
+
             # Compute the rotation of the ball to the camera center
             rotation = camera_pos[-1] + ball_info[0]
 
@@ -148,9 +149,6 @@ class SoccerModule(ALModule):
 
             # Warn that we found a red ball
             print("RED BALL DETECTED " + str(self.ball))
-
-            # Sleep for some time
-            sleep(0.5)
 
     def on_landmark_detected(self):
         """Compute the position of the landmark relative to the robot"""
@@ -174,9 +172,6 @@ class SoccerModule(ALModule):
                 self.move = ([0, 0, rotation], "kick")
                 # Warn that we found a landmark
                 print("LANDMARK DETECTED " + str(self.goal))
-
-                # Wait for some time
-                sleep(0.5)
 
     def on_fall(self):
         """Set the stiffness back and request the robot to get up"""
