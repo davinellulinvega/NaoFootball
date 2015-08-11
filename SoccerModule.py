@@ -105,7 +105,6 @@ class SoccerModule(ALModule):
         memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
         # Subscribe to the robot has fallen event
         memory.subscribeToEvent("robotHasFallen", self.getName(), "on_fall")
-
         # Subscribe to the landmarkDetected event
         memory.subscribeToEvent("LandmarkDetected", self.getName(), "on_landmark_detected")
 
