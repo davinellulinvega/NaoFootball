@@ -54,7 +54,7 @@ class SoccerModule(ALModule):
 		# Register the targets for the tracker
 		self.tracker.registerTarget("RedBall", 0.5)
 		self.tracker.registerTarget("LandMark", [0.2, [85]])
-		# Turn of the search
+		# Turn off the search
 		self.tracker.toggleSearch(False)
 
 		# Subscribe to the redBallDetected event
