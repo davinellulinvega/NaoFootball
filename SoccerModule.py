@@ -139,9 +139,7 @@ class SoccerModule(ALModule):
             self.tracker.setMode("Move")
             # Start to track the red ball
             self.tracker.track("RedBall")
-
-        # Check if we are not already planning a move for the red ball
-        if self.move is None:
+        else:
             # Get the data from the memory
             data = memory.getData("redBallDetected")
             ball_info = data[1]
@@ -157,17 +155,8 @@ class SoccerModule(ALModule):
             dist_eucl = sqrt(self.ball[0]**2 + self.ball[1]**2)
             print("Distance difference: "+str(dist - dist_eucl))
 
-            # Compute the rotation of the ball to the camera center
-            rotation = camera_pos[-1] + ball_info[0]
-
-            # Set the next moves to be executed
-            self.move = ([0, 0, rotation], [dist, 0, 0])
-
-            # Move the head to face the ball
-            # self.motion.setAngles("HeadYaw", -ball_info[0], 0.2)
-
-            # Warn that we found a red ball
-            print("RED BALL DETECTED " + str(self.ball))
+        # Warn that we found a red ball
+        print("RED BALL DETECTED " + str(self.ball))
 
     def on_landmark_detected(self):
         """Compute the position of the landmark relative to the robot"""
