@@ -131,7 +131,10 @@ class SoccerModule(ALModule):
         """Compute the position of the ball relative to the robot and move towards it"""
 
         # Check if the tracker is stopped and not tracking the red ball
-        if not self.tracker.isActive() and self.tracker.getActiveTarget() != "RedBall":
+        if not self.tracker.isActive() or self.tracker.getActiveTarget() != "RedBall":
+            # Stop the tracker
+            self.tracker.stopTracker()
+
             # Ask the robot to track the target by moving towards it
             self.tracker.setMode("Move")
             # Start to track the red ball
