@@ -123,6 +123,13 @@ class SoccerModule(ALModule):
     def shutdown(self):
         """Define the procedure to follow upon shutting down"""
 
+        # If the tracker is still running
+        if self.tracker.isActive():
+            # Shut the tracker down
+            self.tracker.stopTracker()
+
+        # Unregister all tracker's targets
+        self.tracker.unregisterAllTargets()
         # Request the robot to go in resting position
         self.motion.rest()
         # Set the body stiffness to 0
