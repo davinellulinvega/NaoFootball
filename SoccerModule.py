@@ -117,6 +117,9 @@ class SoccerModule(ALModule):
         # Have the robot look for the targets if they are lost
         self.tracker.toggleSearch(True)
 
+        # Have the robot track the red ball
+        self.tracker.track("RedBall")
+
     def shutdown(self):
         """Define the procedure to follow upon shutting down"""
 
@@ -213,25 +216,6 @@ class SoccerModule(ALModule):
         # Turn around
         self.motion.moveTo(0, 0, pi / 2)
 
-    def look_around(self):
-        """Move the robot head from -2.08 to 2.08"""
-
-        # Set the head pitch angle
-        self.motion.setAngles(["HeadPitch"], [20 * almath.TO_RAD], 0.5)
-        # TODO: replace the previous line with an increment for looking up and down back and forth
-        # Set the head yaw angle
-        self.motion.setAngles(["HeadYaw"], [-2.08], 0.1)
-        # Wait for some time
-        sleep(3)
-        # set the head yaw angle
-        self.motion.setAngles(["HeadYaw"], [2.08], 0.1)
-        # Wait for some time
-        sleep(3)
-        # Set the head back to 0
-        self.motion.setAngles(["HeadYaw"], [0], 0.5)
-        # Wait for some time
-        sleep(1)
-
     def kick(self):
         """Have the robot execute a kick"""
 
@@ -291,8 +275,7 @@ def main():
         # Initialize all sub-modules
         soccer_module.initialize()
         while True:
-            soccer_module.look_around()
-            sleep(3)
+            sleep(60)
             # TODO: Move in a strategic way
     except KeyboardInterrupt:
         # Shut the module down
