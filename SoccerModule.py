@@ -155,6 +155,12 @@ class SoccerModule(ALModule):
             dist_eucl = sqrt(self.ball[0]**2 + self.ball[1]**2)
             print("Distance difference: "+str(dist - dist_eucl))
 
+            # If the robot is near the ball enough
+            if dist < 2:
+                # Stop the tracker
+                self.tracker.stopTracker()
+                # TODO: Request the robot to look for the landmark?
+
         # Warn that we found a red ball
         print("RED BALL DETECTED " + str(self.ball))
 
