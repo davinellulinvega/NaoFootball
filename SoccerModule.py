@@ -82,8 +82,6 @@ class SoccerModule(ALModule):
         self.goal = [0, 0]
         # Initialize the ball position
         self.ball = [0, 0]
-        # Initialize a command stack
-        self.move = None
 
     def initialize(self):
         """Subscribe to the required events and enable the different sub-modules"""
@@ -234,36 +232,6 @@ class SoccerModule(ALModule):
         # Wait for some time
         sleep(1)
 
-    def next_move(self):
-        """Execute the next move in the stack"""
-
-        # Check if there is any move to be done
-        if self.move is None:
-            # Return a bad result
-            result = False
-        else:
-            # Execute the move
-            for moves in list(self.move):
-                # Display the next move
-                print("NEXT ACTION: " + str(moves))
-                # Check if a kick
-                if moves == "kick":
-                    # Have the robot kick
-                    self.kick()
-                else:
-                    # Make the robot move
-                    self.motion.moveTo(moves[0], moves[1], moves[2])
-                # Return a good result
-                result = True
-
-            # Wait for a little time
-            sleep(1)
-            # Assign None to move
-            self.move = None
-
-        # Return the final result
-        return result
-
     def kick(self):
         """Have the robot execute a kick"""
 
@@ -323,12 +291,9 @@ def main():
         # Initialize all sub-modules
         soccer_module.initialize()
         while True:
-            # Execute the next move if possible
-            if not soccer_module.next_move():
-                # Have a look around
-                soccer_module.look_around()
-                sleep(3)
-                # TODO: Move in a strategic way
+            soccer_module.look_around()
+            sleep(3)
+            # TODO: Move in a strategic way
     except KeyboardInterrupt:
         # Shut the module down
         soccer_module.shutdown()
