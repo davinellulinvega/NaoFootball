@@ -75,6 +75,8 @@ class SoccerModule(ALModule):
         self.motion = ALProxy("ALMotion")
         # Initialize the posture module
         self.posture = ALProxy("ALRobotPosture")
+        # Initialize the tracker module
+        self.tracker = ALProxy("ALTracker")
 
         # Initialize the goal position
         self.goal = [0, 0]
@@ -103,10 +105,7 @@ class SoccerModule(ALModule):
         memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
         # Subscribe to the robot has fallen event
         memory.subscribeToEvent("robotHasFallen", self.getName(), "on_fall")
-        # memory.subscribeToEvent("ALMotion/RobotIsFalling", self.getName(), "on_fall")
-        # Subscribe to the bumperPressed event
-        # memory.subscribeToEvent("RightBumperPressed", self.getName(), "on_bumper_pressed")
-        # memory.subscribeToEvent("LeftBumperPressed", self.getName(), "on_bumper_pressed")
+
         # Subscribe to the landmarkDetected event
         memory.subscribeToEvent("LandmarkDetected", self.getName(), "on_landmark_detected")
 
