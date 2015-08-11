@@ -167,8 +167,16 @@ class SoccerModule(ALModule):
     def on_landmark_detected(self):
         """Compute the position of the landmark relative to the robot"""
 
-        # Check if we are not already planning a move for the landmark
-        if self.move is None:
+        # If the tracker is stopped or not following the landmark
+        if not self.tracker.isActive() or self.tracker.getActiveTarget() != "LandMark":
+            # Stop the tracker
+            self.tracker.stopTracker()
+
+            # Ask the robot to track the target by moving only its body
+            self.tracker.setMode("WholeBody")
+            # Start to track the landmark
+            self.tracker.track("LandMark")
+        else:
             # Get the data from the memory
             data = memory.getData("LandmarkDetected")
             # Check that we have the right mark
@@ -182,8 +190,12 @@ class SoccerModule(ALModule):
                 # Turn the robot toward the goal
                 rotation = atan((self.goal[0] - self.ball[0]) / (self.goal[1] - self.ball[1]))
 
-                # Add the action to the stack
-                self.move = ([0, 0, rotation], "kick")
+                # If the robot is facing the landmark
+                if -2 < rotation < 2:
+                    # Stop the tracker
+                    self.tracker.stopTracker()
+                    # TODO: Request the robot to kick
+
                 # Warn that we found a landmark
                 print("LANDMARK DETECTED " + str(self.goal))
 
