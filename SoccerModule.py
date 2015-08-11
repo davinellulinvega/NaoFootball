@@ -108,6 +108,17 @@ class SoccerModule(ALModule):
         # Subscribe to the landmarkDetected event
         memory.subscribeToEvent("LandmarkDetected", self.getName(), "on_landmark_detected")
 
+        # Register the red ball and landmark as targets for the tracker module
+        self.tracker.registerTarget("RedBall", 0.5)  # The second parameter is the distance to keep with the ball
+        self.tracker.registerTarget("LandMark", [0.2, [85]])  # The second parameter is the target's size, followed by the mark id
+
+        # Fix the tracker's limits
+        self.tracker.setMaximumDistanceDetection(2)  # Objects more than 2 meters away are not considered
+        self.tracker.setTimeout(2000)  # Objects not detected for more than 2 sec are lost
+
+        # Have the robot look for the targets if they are lost
+        self.tracker.toggleSearch(True)
+
     def shutdown(self):
         """Define the procedure to follow upon shutting down"""
 
