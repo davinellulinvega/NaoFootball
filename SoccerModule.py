@@ -130,7 +130,7 @@ class SoccerModule(ALModule):
     def on_red_ball(self):
         """Compute the position of the ball relative to the robot and move towards it"""
 
-        # Check if the tracker is stopped and not tracking the red ball
+        # Check if the tracker is stopped or not tracking the red ball
         if not self.tracker.isActive() or self.tracker.getActiveTarget() != "RedBall":
             # Stop the tracker
             self.tracker.stopTracker()
@@ -159,7 +159,7 @@ class SoccerModule(ALModule):
             if dist < 2:
                 # Stop the tracker
                 self.tracker.stopTracker()
-                # TODO: Request the robot to look for the landmark?
+                # TODO: Request the robot to look for the landmark
 
         # Warn that we found a red ball
         print("RED BALL DETECTED " + str(self.ball))
