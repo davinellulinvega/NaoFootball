@@ -130,6 +130,13 @@ class SoccerModule(ALModule):
     def on_red_ball(self):
         """Compute the position of the ball relative to the robot and move towards it"""
 
+        # Check if the tracker is stopped and not tracking the red ball
+        if not self.tracker.isActive() and self.tracker.getActiveTarget() != "RedBall":
+            # Ask the robot to track the target by moving towards it
+            self.tracker.setMode("Move")
+            # Start to track the red ball
+            self.tracker.track("RedBall")
+
         # Check if we are not already planning a move for the red ball
         if self.move is None:
             # Get the data from the memory
