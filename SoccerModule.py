@@ -54,8 +54,10 @@ class SoccerModule(ALModule):
 		# Register the targets for the tracker
 		self.tracker.registerTarget("RedBall", 0.5)
 		self.tracker.registerTarget("LandMark", [0.2, [85]])
-		# Turn off the search
-		self.tracker.toggleSearch(False)
+		# Turn on the search
+		self.tracker.toggleSearch(True)
+                # Set the maximum detection distance to 50 centimeters
+                self.tracker.setMaximumDistanceDetection(0.5)
 
 		# Subscribe to the redBallDetected event
 		memory.subscribeToEvent("redBallDetected", self.getName(), "on_red_ball")
