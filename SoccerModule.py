@@ -111,8 +111,8 @@ class SoccerModule(ALModule):
         self.tracker.registerTarget("LandMark", [0.2, [85]])  # The second parameter is the target's size, followed by the mark id
 
         # Fix the tracker's limits
-        self.tracker.setMaximumDistanceDetection(2)  # Objects more than 2 meters away are not considered
-        self.tracker.setTimeout(2000)  # Objects not detected for more than 2 sec are lost
+        self.tracker.setMaximumDistanceDetection(0.5)  # Objects more than 50 centimeters away are not considered
+        self.tracker.setTimeOut(2000)  # Objects not detected for more than 2 sec are lost
 
         # Have the robot look for the targets if they are lost
         self.tracker.toggleSearch(True)
@@ -149,6 +149,7 @@ class SoccerModule(ALModule):
             self.tracker.track("RedBall")
         else:
             # Get the data from the memory
+            # Apparently the robot blocks all calls here because the data query is really slow.
             data = memory.getData("redBallDetected")
             ball_info = data[1]
             camera_pos = data[3]
