@@ -164,7 +164,7 @@ class SoccerModule(ALModule):
             dist_eucl = sqrt(self.ball[0]**2 + self.ball[1]**2)
             print("Distance difference: "+str(dist - dist_eucl))
 
-            # If the robot is near the ball enough
+            # If the robot is near the ball enough (set to 2 centimeters here)
             if dist < 2:
                 # Stop the tracker
                 self.tracker.stopTracker()
@@ -199,7 +199,7 @@ class SoccerModule(ALModule):
                 # Turn the robot toward the goal
                 rotation = atan((self.goal[0] - self.ball[0]) / (self.goal[1] - self.ball[1]))
 
-                # If the robot is facing the landmark
+                # If the robot is facing the landmark with a 2 degree precision
                 if -2 < rotation < 2:
                     # Stop the tracker
                     self.tracker.stopTracker()
