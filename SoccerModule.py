@@ -200,7 +200,7 @@ class SoccerModule(ALModule):
                 rotation = atan((self.goal[0] - self.ball[0]) / (self.goal[1] - self.ball[1]))
 
                 # If the robot is facing the landmark with a 2 degree precision
-                if -2 < rotation < 2:
+                if -2 * almath.TO_RAD < rotation < 2 * almath.TO_RAD:
                     # Stop the tracker
                     self.tracker.stopTracker()
                     # TODO: Request the robot to kick
